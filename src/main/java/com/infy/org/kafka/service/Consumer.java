@@ -12,5 +12,6 @@ public class Consumer {
 	@KafkaListener(topics = "${topic.name}", groupId = "group_id")
 	public void consume(String message) {
 		logger.info(String.format("$$ -> Consumed Message -> %s", message));
+		System.out.println("Samrat basu");
 	}
 }

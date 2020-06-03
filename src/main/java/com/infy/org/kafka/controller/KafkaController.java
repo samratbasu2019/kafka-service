@@ -2,6 +2,8 @@ package com.infy.org.kafka.controller;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,8 +22,9 @@ public class KafkaController {
 	}
 
 	@PostMapping(value = "/publish")
-	public void sendMessageToKafkaTopic(@RequestParam("message") String message) {
+	public ResponseEntity<?> sendMessageToKafkaTopic(@RequestParam("message") String message) {
 		
 		this.producer.sendMessage(message);
+		return new ResponseEntity<>("Message published Successfully", HttpStatus.OK);
 	}
 }
