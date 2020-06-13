@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.infy.org.kafka.utility.Constant;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -26,48 +27,125 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 //import org.apache.velocity.app.VelocityEngine;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 
 //import org.springframework.ui.velocity.VelocityEngineUtils;
 
 @Service
-public class Processor{
+public class Processor {
 	private static final Logger log = LoggerFactory.getLogger(Processor.class);
 	@Autowired
 	private JavaMailSender mailSender;
 
+	@Value("${app.appreciation.receiver.email.body}")
+	private String appreciationReceiverEmailBody;
+	@Value("${app.appreciation.receiver.email.subject}")
+	private String appreciationReceiverEmailSubject;
+
+	@Value("${app.appreciation.provider.email.body}")
+	private String appreciationProviderEmailBody;
+	@Value("${app.appreciation.provider.email.subject}")
+	private String appreciationProviderEmailSubject;
+
+	@Value("${app.feedback.receiver.email.body}")
+	private String feedbackReceiverEmailBody;
+	@Value("${app.feedback.receiver.email.subject}")
+	private String feedbackReceiverEmailSubject;
+
+	@Value("${app.feedback.provider.email.body}")
+	private String feedbackProviderEmailBody;
+	@Value("${app.feedback.provider.email.subject}")
+	private String feedbackProviderEmailSubject;
+
+	@Value("${app.task.complete.email.body}")
+	private String taskCompleteEmailBody;
+	@Value("${app.task.complete.email.subject}")
+	private String taskCompleteEmailSubject;
+
+	@Value("$app.task.assign.email.body}")
+	private String taskAssignedEmailBody;
+	@Value("${app.task.assign.email.subject}")
+	private String taskAssignedEmailSubject;
+
+	@Value("${app.course.complete.email.body}")
+	private String courseCompleteEmailBody;
+	@Value("${app.course.complete.email.subject}")
+	private String courseCompleteEmailSubject;
+
 	@Autowired
 	private Configuration freemarkerConfig;
 
-	public boolean parsePayload(String message) {
+	public boolean parsePayload(String message, String type) throws Exception {
+		log.info("Inside parser payload");
+		String parentName = null, patentEmail = null, childName = null, childEmail = null;
+		Iterator<JsonNode> childIterator;
 		ObjectMapper obm = new ObjectMapper();
 		boolean hasProcessed = false;
-		try {
-			JsonNode parentNode = obm.readValue(message, JsonNode.class);
-			ArrayNode childNode = (ArrayNode) parentNode.get("appreciation");
-			String appreciatorName=null,appreciatorEmail=null;
-			log.info("parent appreciation receiver emails :" + parentNode.get("email").asText());
+		JsonNode parentNode = obm.readValue(message, JsonNode.class);
 
-			Iterator<JsonNode> childIterator = childNode.elements();
+		switch (type) {
+		case Constant.APPRECIATION:
+			ArrayNode childNode = (ArrayNode) parentNode.get("appreciation");
+			parentName = parentNode.get("name").asText().trim();
+			patentEmail = parentNode.get("email").asText().trim();
+			log.info("parent appreciation receiver emails :" + parentNode.get("email").asText());
+			childIterator = childNode.elements();
 			while (childIterator.hasNext()) {
 				JsonNode clildrenNode = childIterator.next();
-				appreciatorName=clildrenNode.get("appreciatorName").asText();
-				appreciatorEmail=clildrenNode.get("appreciatorEmail").asText();
+				childName = clildrenNode.get("appreciatorName").asText().trim();
+				childEmail = clildrenNode.get("appreciatorEmail").asText().trim();
 				log.info("Child  appreciation giver email :" + clildrenNode.get("appreciatorEmail"));
 			}
-			hasProcessed = sendEmail(parentNode.get("email").asText(), parentNode.get("name").asText(), appreciatorName);
+			hasProcessed = sendEmail(patentEmail,parentName, childName, appreciationReceiverEmailBody,
+					appreciationReceiverEmailSubject);
+			hasProcessed = sendEmail(childEmail, childName, parentName, appreciationProviderEmailBody,
+					appreciationProviderEmailSubject);
+			break;
+		case Constant.FEEDBACK:
+			ArrayNode childFeedbackNode = (ArrayNode) parentNode.get("feedback");
+			
+			parentName = parentNode.get("name").asText().trim();
+			patentEmail = parentNode.get("email").asText().trim();
+			log.info("parent feedback receiver emails :" + parentNode.get("email").asText());
+			childIterator = childFeedbackNode.elements();
+			while (childIterator.hasNext()) {
+				JsonNode clildrenNode = childIterator.next();
+				childName = clildrenNode.get("feedbackerName").asText().trim();
+				childEmail = clildrenNode.get("feedbackerEmail").asText().trim();
+				log.info("Child  feedback giver email :" + clildrenNode.get("feedbackerEmail"));
+			}
+			hasProcessed = sendEmail(patentEmail, parentName, childName, feedbackReceiverEmailBody,
+					feedbackReceiverEmailSubject);
+			hasProcessed = sendEmail(childEmail, childName, parentName, feedbackProviderEmailBody,
+					feedbackProviderEmailSubject);
+			break;
+		case Constant.COURSE:
+			ArrayNode childCourseNode = (ArrayNode) parentNode.get("course");
+			
+			parentName = parentNode.get("name").asText().trim();
+			patentEmail = parentNode.get("email").asText().trim();
+			log.info("parent course receiver emails :" + parentNode.get("email").asText());
+			childIterator = childCourseNode.elements();
+			while (childIterator.hasNext()) {
+				JsonNode clildrenNode = childIterator.next();
+				childName = clildrenNode.get("courseName").asText().trim();
+				log.info("Child  appreciation giver email :" + clildrenNode.get("courseName"));
+			}
+			hasProcessed = sendEmail(patentEmail, parentName, childName, courseCompleteEmailBody,
+					courseCompleteEmailSubject);
+			break;
 
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 
 		return hasProcessed;
+
 	}
 
-	private boolean sendEmail(String toEmailId, String toName, String fromName) throws Exception {
+	private boolean sendEmail(String toEmailId, String toName, String fromName, String emailBodyTemplate,
+			String emailSubjectTemplate) throws Exception {
 		boolean hasProcessed = false;
-		log.info("Sending emails to : "+toEmailId + " name :"+toName+" Sent from :"+fromName);
+		log.info("Sending emails to : " + toEmailId + " name :" + toName + " Sent from :" + fromName);
 		MimeMessage message = mailSender.createMimeMessage();
 
 		MimeMessageHelper helper = new MimeMessageHelper(message);
@@ -77,17 +155,17 @@ public class Processor{
 		model.put("appreciator", fromName);
 		freemarkerConfig.setClassForTemplateLoading(this.getClass(), "/");
 
-		Template t = freemarkerConfig.getTemplate("email-appreciation-body.ftl");
+		Template t = freemarkerConfig.getTemplate(emailBodyTemplate);
 		String text = FreeMarkerTemplateUtils.processTemplateIntoString(t, model);
 
 		helper.setTo(toEmailId);
 		helper.setText(text, true); // set to html
-		
+
 		Map<String, Object> modelSub = new HashMap<>();
 		modelSub.put("appreciator", fromName);
-		Template sub = freemarkerConfig.getTemplate("email-appreciation-subject.ftl");
+		Template sub = freemarkerConfig.getTemplate(emailSubjectTemplate);
 		String subject = FreeMarkerTemplateUtils.processTemplateIntoString(sub, modelSub);
-		
+
 		helper.setSubject(subject);
 
 		mailSender.send(message);

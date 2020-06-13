@@ -2,7 +2,7 @@
     <body>
         <h3>Dear ${user},</h3>
         	<p>
-           			You received an appreciation from ${appreciator}. Pls logon to iCount to view the message. 
+           			You received feedback from ${appreciator}. Pls logon to iCount to view the feedback. 
            			You can either set it to visible to your manager or make it private.
        		 </p>
        	<p>Regards,</p>

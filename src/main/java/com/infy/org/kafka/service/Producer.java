@@ -10,15 +10,42 @@ import org.springframework.stereotype.Service;
 @Service
 public class Producer {
 	private static final Logger logger = LoggerFactory.getLogger(Producer.class);
-	private static final String TOPIC = "users";
-	//@Value("${topic.name}")
-	//private String TopicName;
+	@Value("${topic.name.appreciation}")
+	private String topicNameAppreciation;
+	
+	@Value("${topic.name.feedback}")
+	private String topicNameFeedback;
+	
+	@Value("${topic.name.course}")
+	private String topicNameCourse;
+	
+	@Value("${topic.name.task}")
+	private String topicNameTask;
 	
 	@Autowired
 	private KafkaTemplate<String, String> kafkaTemplate;
 
-	public void sendMessage(String message) {
+	public void sendAppreciationMessage(String message) {
 		logger.info(String.format("$$ -> Producing message --> %s", message));
-		this.kafkaTemplate.send(TOPIC, message);
+		logger.info("topic name :"+topicNameAppreciation);
+		this.kafkaTemplate.send(topicNameAppreciation, message);
+	}
+	
+	public void sendFeedbackMessage(String message) {
+		logger.info(String.format("$$ -> Producing message --> %s", message));
+		logger.info("topic name :"+topicNameFeedback);
+		this.kafkaTemplate.send(topicNameFeedback, message);
+	}
+	
+	public void sendCourseMessage(String message) {
+		logger.info(String.format("$$ -> Producing message --> %s", message));
+		logger.info("topic name :"+topicNameCourse);
+		this.kafkaTemplate.send(topicNameCourse, message);
+	}
+	
+	public void sendTaskMessage(String message) {
+		logger.info(String.format("$$ -> Producing message --> %s", message));
+		logger.info("topic name :"+topicNameTask);
+		this.kafkaTemplate.send(topicNameTask, message);
 	}
 }

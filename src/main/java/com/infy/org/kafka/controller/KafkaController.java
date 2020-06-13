@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.infy.org.kafka.service.Producer;
+import com.infy.org.kafka.utility.Constant;
 
 @RestController
 @RequestMapping(value = "/kafka")
@@ -22,10 +23,13 @@ public class KafkaController {
 	}
 
 	@PostMapping(value = "/publish")
-	//@RequestMapping(value = "/publish", method = RequestMethod.POST, produces = "application/json")
-	public ResponseEntity<?> sendMessageToKafkaTopic(@RequestParam("message") String message) {
-
-		this.producer.sendMessage(message);
+	public ResponseEntity<?> sendMessageToKafkaTopic(@RequestParam("message") String message, @RequestParam("type") String type) {
+		if (type.equalsIgnoreCase(Constant.APPRECIATION))
+			this.producer.sendAppreciationMessage(message);
+		else if(type.equalsIgnoreCase(Constant.FEEDBACK))
+			this.producer.sendFeedbackMessage(message);
+		else if(type.equalsIgnoreCase(Constant.COURSE))
+			this.producer.sendCourseMessage(message);
 		return new ResponseEntity<>("Message published Successfully", HttpStatus.OK);
 	}
 }

@@ -21,7 +21,11 @@ logging:
   springframework: DEBUG
 
 topic:
- name: user
+ name: 
+  appreciation: appreciation
+  feedback: feedback
+  course: course
+  task: task
 
 spring.mail.host: smtp.gmail.com
 spring.mail.port: 587
@@ -37,3 +41,20 @@ spring.mail.properties.mail.smtp.connectiontimeout: 5000
 spring.mail.properties.mail.smtp.timeout: 5000
 spring.mail.properties.mail.smtp.writetimeout: 5000
 
+app.appreciation.receiver.email.body: email-appreciation-body.ftl
+app.appreciation.receiver.email.subject: email-appreciation-subject.ftl
+app.appreciation.provider.email.body: email-appreciation-provider-body.ftl
+app.appreciation.provider.email.subject: email-appreciation-provider-subject.ftl
+
+app.feedback.receiver.email.body: email-feedback-body.ftl
+app.feedback.receiver.email.subject: email-feedback-subject.ftl
+app.feedback.provider.email.body: email-feedback-provider-body.ftl
+app.feedback.provider.email.subject: email-feedback-provider-subject.ftl
+
+app.course.complete.email.body: email-course-body.ftl
+app.course.complete.email.subject: email-course-subject.ftl
+
+app.task.complete.email.body: email-task-complete-body.ftl
+app.task.complete.email.subject: email-task-complete-subject.ftl
+app.task.assign.email.body: email-task-assign-body.ftl
+app.task.assign.email.subject: email-task-assign-subject.ftl
