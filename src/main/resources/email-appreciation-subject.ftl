@@ -1,0 +1,1 @@
+Congratulations! you received appreciation from ${appreciator}
