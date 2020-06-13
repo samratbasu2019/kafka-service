@@ -56,7 +56,6 @@ public class Processor{
 				log.info("Child  appreciation giver email :" + clildrenNode.get("appreciatorEmail"));
 			}
 			hasProcessed = sendEmail(parentNode.get("email").asText(), parentNode.get("name").asText(), appreciatorName);
-			hasProcessed=true;
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
