@@ -62,11 +62,21 @@ public class Processor {
 	private String taskCompleteEmailBody;
 	@Value("${app.task.complete.email.subject}")
 	private String taskCompleteEmailSubject;
+	
+	@Value("${app.task.complete.ack.email.body}")
+	private String taskCompleteAckEmailBody;
+	@Value("${app.task.complete.ack.email.subject}")
+	private String taskCompleteAckEmailSubject;
 
-	@Value("$app.task.assign.email.body}")
+	@Value("${app.task.assign.email.body}")
 	private String taskAssignedEmailBody;
 	@Value("${app.task.assign.email.subject}")
 	private String taskAssignedEmailSubject;
+
+	@Value("${app.task.assign.ack.email.body}")
+	private String taskAssignedAckEmailBody;
+	@Value("${app.task.assign.ack.email.subject}")
+	private String taskAssignedAckEmailSubject;
 
 	@Value("${app.course.complete.email.body}")
 	private String courseCompleteEmailBody;
@@ -78,7 +88,7 @@ public class Processor {
 
 	public boolean parsePayload(String message, String type) throws Exception {
 		log.info("Inside parser payload");
-		String parentName = null, patentEmail = null, childName = null, childEmail = null;
+		String parentName = null, patentEmail = null, childName = null, childEmail = null, taskStatus = null;
 		Iterator<JsonNode> childIterator;
 		ObjectMapper obm = new ObjectMapper();
 		boolean hasProcessed = false;
@@ -97,14 +107,14 @@ public class Processor {
 				childEmail = clildrenNode.get("appreciatorEmail").asText().trim();
 				log.info("Child  appreciation giver email :" + clildrenNode.get("appreciatorEmail"));
 			}
-			hasProcessed = sendEmail(patentEmail,parentName, childName, appreciationReceiverEmailBody,
+			hasProcessed = sendEmail(patentEmail, parentName, childName, appreciationReceiverEmailBody,
 					appreciationReceiverEmailSubject);
 			hasProcessed = sendEmail(childEmail, childName, parentName, appreciationProviderEmailBody,
 					appreciationProviderEmailSubject);
 			break;
 		case Constant.FEEDBACK:
 			ArrayNode childFeedbackNode = (ArrayNode) parentNode.get("feedback");
-			
+
 			parentName = parentNode.get("name").asText().trim();
 			patentEmail = parentNode.get("email").asText().trim();
 			log.info("parent feedback receiver emails :" + parentNode.get("email").asText());
@@ -122,7 +132,7 @@ public class Processor {
 			break;
 		case Constant.COURSE:
 			ArrayNode childCourseNode = (ArrayNode) parentNode.get("course");
-			
+
 			parentName = parentNode.get("name").asText().trim();
 			patentEmail = parentNode.get("email").asText().trim();
 			log.info("parent course receiver emails :" + parentNode.get("email").asText());
@@ -134,6 +144,33 @@ public class Processor {
 			}
 			hasProcessed = sendEmail(patentEmail, parentName, childName, courseCompleteEmailBody,
 					courseCompleteEmailSubject);
+			break;
+		case Constant.TASK:
+			ArrayNode childTaskNode = (ArrayNode) parentNode.get("task");
+
+			parentName = parentNode.get("name").asText().trim();
+			patentEmail = parentNode.get("email").asText().trim();
+			log.info("parent course receiver emails :" + parentNode.get("email").asText());
+			childIterator = childTaskNode.elements();
+			while (childIterator.hasNext()) {
+				JsonNode clildrenNode = childIterator.next();
+				childName = clildrenNode.get("taskCreatorName").asText().trim();
+				childEmail = clildrenNode.get("taskCreatorEmail").asText().trim();
+				taskStatus = clildrenNode.get("taskStatus").asText().trim();
+				log.info("Child  Task giver email :" + clildrenNode.get("taskName"));
+			}
+			if (!taskStatus.equalsIgnoreCase(Constant.APPROVED)) {
+				hasProcessed = sendEmail(patentEmail, parentName, childName, taskAssignedAckEmailBody,
+						taskAssignedAckEmailSubject);
+				hasProcessed = sendEmail(childEmail, childName, parentName, taskAssignedEmailBody,
+						taskAssignedEmailSubject);
+
+			}else {
+				hasProcessed = sendEmail(patentEmail, parentName, childName, taskCompleteEmailBody,
+						taskCompleteEmailSubject);
+				hasProcessed = sendEmail(childEmail, childName, parentName, taskCompleteAckEmailBody,
+						taskCompleteAckEmailSubject);
+			}
 			break;
 
 		}

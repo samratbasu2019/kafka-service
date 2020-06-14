@@ -56,5 +56,10 @@ app.course.complete.email.subject: email-course-subject.ftl
 
 app.task.complete.email.body: email-task-complete-body.ftl
 app.task.complete.email.subject: email-task-complete-subject.ftl
+app.task.complete.ack.email.body: email-task-complete-ack-body.ftl
+app.task.complete.ack.email.subject: email-task-complete-ack-subject.ftl
+
 app.task.assign.email.body: email-task-assign-body.ftl
 app.task.assign.email.subject: email-task-assign-subject.ftl
+app.task.assign.ack.email.body: email-task-assign-ack-body.ftl
+app.task.assign.ack.email.subject: email-task-assign-ack-subject.ftl

@@ -8,5 +8,5 @@ public class Constant {
 	public final static String COURSE = "course";
 	public final static String TASK = "task";
 	public final static String FEEDBACK = "feedback";
-
+	public final static String APPROVED = "approved";
 }

@@ -35,6 +35,8 @@ public class KafkaController {
 			this.producer.sendFeedbackMessage(message);
 		else if(type.equalsIgnoreCase(Constant.COURSE))
 			this.producer.sendCourseMessage(message);
+		else if(type.equalsIgnoreCase(Constant.TASK))
+			this.producer.sendTaskMessage(message);
 		return new ResponseEntity<>("Message published Successfully", HttpStatus.OK);
 	}
 }
