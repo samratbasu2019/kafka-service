@@ -22,6 +22,9 @@ public class Producer {
 	@Value("${topic.name.task}")
 	private String topicNameTask;
 	
+	@Value("${topic.name.jiratask}")
+	private String topicNameJiraTask;
+	
 	@Autowired
 	private KafkaTemplate<String, String> kafkaTemplate;
 
@@ -47,5 +50,11 @@ public class Producer {
 		logger.info(String.format("$$ -> Producing message --> %s", message));
 		logger.info("topic name :"+topicNameTask);
 		this.kafkaTemplate.send(topicNameTask, message);
+	}
+	
+	public void sendJiraTaskMessage(String message) {
+		logger.info(String.format("$$ -> Producing message --> %s", message));
+		logger.info("topic name :"+topicNameJiraTask);
+		this.kafkaTemplate.send(topicNameJiraTask, message);
 	}
 }

@@ -69,4 +69,16 @@ public class Consumer {
 		}
 		logger.info(String.format("$$ -> Message Consumed and email sent successful for this message -> %s", message));
 	}
+	
+	@KafkaListener(topics = "${topic.name.jiratask}", groupId = "group_id")
+	public void consumeJiraTask(String message) {
+		logger.info("Inside consumer service Jira Task.");
+		boolean hasProcessed = false;
+		try {
+			hasProcessed = ps.parsePayload(message, Constant.JIRATASK);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		logger.info(String.format("$$ -> Message Consumed and email sent successful for this message -> %s", message));
+	}
 }

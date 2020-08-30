@@ -10,6 +10,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
+import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -82,6 +83,11 @@ public class Processor {
 	private String courseCompleteEmailBody;
 	@Value("${app.course.complete.email.subject}")
 	private String courseCompleteEmailSubject;
+	
+	@Value("${app.jira.task.assign.email.body}")
+	private String jiraTaskAssignedEmailBody;
+	@Value("${app.jira.task.assign.email.subject}")
+	private String jiraTaskAssignedEmailSubject;
 
 	@Autowired
 	private Configuration freemarkerConfig;
@@ -171,6 +177,17 @@ public class Processor {
 				hasProcessed = sendEmail(childEmail, childName, parentName, taskCompleteAckEmailBody,
 						taskCompleteAckEmailSubject);
 			}
+			break;
+		case Constant.JIRATASK:
+			//ArrayNode childJiraTaskNode = (ArrayNode) parentNode.get("task");
+
+			parentName = parentNode.get("name").asText().trim();
+			patentEmail = parentNode.get("email").asText().trim();
+			log.info("parent course receiver emails :" + parentNode.get("email").asText());
+			//childIterator = childJiraTaskNode.elements();
+			hasProcessed = sendEmail(patentEmail, parentName, "", jiraTaskAssignedEmailBody,
+						jiraTaskAssignedEmailSubject);
+	
 			break;
 
 		}

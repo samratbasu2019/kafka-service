@@ -26,6 +26,7 @@ topic:
   feedback: feedback
   course: course
   task: task
+  jiratask: jiratask
 
 spring.mail.host: smtp.gmail.com
 spring.mail.port: 587
@@ -63,3 +64,6 @@ app.task.assign.email.body: email-task-assign-body.ftl
 app.task.assign.email.subject: email-task-assign-subject.ftl
 app.task.assign.ack.email.body: email-task-assign-ack-body.ftl
 app.task.assign.ack.email.subject: email-task-assign-ack-subject.ftl
+
+app.jira.task.assign.email.body: email-jira-task-assign-body.ftl
+app.jira.task.assign.email.subject: email-jira-task-assign-subject.ftl
